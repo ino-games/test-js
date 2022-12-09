@@ -82,7 +82,60 @@ const slotMachineCadences: RoundsCadences = { roundOne: [], roundTwo: [], roundT
  */
 function slotCadence(symbols: Array<SlotCoordinate>): SlotCadence {
   // Magic
-  return [];
+  let i = 0;
+  const array: number[] = [];
+  const arrLength = anticipatorConfig.columnSize - 1;
+  const defaultCadence = anticipatorConfig.defaultCadence;
+  const anticipateCadence = anticipatorConfig.anticipateCadence;
+  const maxSymbols = anticipatorConfig.maxToAnticipate;
+  const minSymbols = anticipatorConfig.minToAnticipate;
+  const arraySymbols = symbols.map((s) => s.column);
+  const minValue = Math.min(...arraySymbols);
+  const maxValue = Math.max(...arraySymbols);
+  array[0] = 0;
+
+  //se quantidade de symbols é menor que maxsymb a partir da coluna que tem o primeiro symbol soma array[i] += anticC
+  if (symbols.length < maxSymbols && symbols.length >= minSymbols) {
+    for (i; array.length <= arrLength; i++) {
+      if (i === minValue) {
+        for (i; array.length <= arrLength; i++) {
+          const result = array[i] + anticipateCadence;
+          array.push(result);
+        }
+      } else {
+        const result = array[i] + defaultCadence;
+        array.push(result);
+      }
+    }
+    // se quantidade de symbols é == a maxsymb então a partir da coluna que tem o primeiro symbol ATE ultima coluna soma array[i] += anticC
+  } else if (symbols.length === maxSymbols && symbols.length >= minSymbols) {
+    console.log(symbols.length);
+    for (i; array.length <= arrLength; i++) {
+      if (i >= minValue && i < maxValue) {
+        const result = array[i] + anticipateCadence;
+        array.push(result);
+      } else {
+        const result = array[i] + defaultCadence;
+        array.push(result);
+      }
+    }
+    // se quantidade de symbols é maior que maxsymbols array[i]+= defaultCad e se quantidade de symbols é menor que minsymb array[i] += defaultCad
+  } else {
+    for (i; array.length <= arrLength; i++) {
+      if (i === minValue) {
+        for (i; array.length <= arrLength; i++) {
+          const result = array[i] + anticipateCadence;
+          array.push(result);
+        }
+      } else {
+        const result = array[i] + defaultCadence;
+        array.push(result);
+      }
+    }
+  }
+
+  //return array[tempo de cadencia das colunas]
+  return array;
 }
 
 /**
