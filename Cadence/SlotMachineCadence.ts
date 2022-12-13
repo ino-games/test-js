@@ -71,7 +71,11 @@ const gameRounds: RoundsSymbols = {
 /**
  * This must be used to get all game rounds cadences.
  */
-const slotMachineCadences: RoundsCadences = { roundOne: [], roundTwo: [], roundThree: [] };
+const slotMachineCadences: RoundsCadences = {
+  roundOne: [],
+  roundTwo: [],
+  roundThree: [],
+};
 
 /**
  * This function receives an array of coordinates relative to positions in the slot machine's matrix.
@@ -82,7 +86,59 @@ const slotMachineCadences: RoundsCadences = { roundOne: [], roundTwo: [], roundT
  */
 function slotCadence(symbols: Array<SlotCoordinate>): SlotCadence {
   // Magic
-  return [];
+  
+  const array: number[] = [];
+  const arrLength = anticipatorConfig.columnSize - 1;
+  const defaultCadence = anticipatorConfig.defaultCadence;
+  const anticipateCadence = anticipatorConfig.anticipateCadence;
+  const maxSymbols = anticipatorConfig.maxToAnticipate;
+  const minSymbols = anticipatorConfig.minToAnticipate;
+  const arraySymbols = symbols.map((s) => s.column);
+  const minValue = Math.min(...arraySymbols);
+  const maxValue = Math.max(...arraySymbols);
+  array[0] = 0;
+
+  //se quantidade de symbols é menor que maxsymb a partir da coluna que tem o primeiro symbol soma array[i] += anticC
+  if (symbols.length < maxSymbols && symbols.length >= minSymbols) {
+    for (let i = 0; array.length <= arrLength; i++) {
+      if (i === minValue) {
+        for (i; array.length <= arrLength; i++) {
+          const result = array[i] + anticipateCadence;
+          array.push(result);
+        }
+      } else {
+        const result = array[i] + defaultCadence;
+        array.push(result);
+      }
+    }
+    // se quantidade de symbols é == a maxsymb então a partir da coluna que tem o primeiro symbol ATE ultima coluna soma array[i] += anticC
+  } else if (symbols.length === maxSymbols && symbols.length >= minSymbols) {
+    for (let x = 0; array.length <= arrLength; x++) {
+      if (x >= minValue && x < maxValue) {
+        const result = array[x] + anticipateCadence;
+        array.push(result);
+      } else {
+        const result = array[x] + defaultCadence;
+        array.push(result);
+      }
+    }
+    // se quantidade de symbols é maior que maxsymbols array[i]+= defaultCad e se quantidade de symbols é menor que minsymb array[i] += defaultCad
+  } else {
+    for (let j = 0; array.length <= arrLength; j++) {
+      if (j === minValue) {
+        for (j; array.length <= arrLength; j++) {
+          const result = array[j] + anticipateCadence;
+          array.push(result);
+        }
+      } else {
+        const result = array[j] + defaultCadence;
+        array.push(result);
+      }
+    }
+  }
+
+  //return array[tempo de cadencia das colunas]
+  return array;
 }
 
 /**
@@ -93,9 +149,11 @@ function slotCadence(symbols: Array<SlotCoordinate>): SlotCadence {
 function handleCadences(rounds: RoundsSymbols): RoundsCadences {
   slotMachineCadences.roundOne = slotCadence(rounds.roundOne.specialSymbols);
   slotMachineCadences.roundTwo = slotCadence(rounds.roundTwo.specialSymbols);
-  slotMachineCadences.roundThree = slotCadence(rounds.roundThree.specialSymbols);
+  slotMachineCadences.roundThree = slotCadence(
+    rounds.roundThree.specialSymbols
+  );
 
   return slotMachineCadences;
 }
 
-console.log('CADENCES: ', handleCadences(gameRounds));
+console.log("CADENCES: ", handleCadences(gameRounds));
