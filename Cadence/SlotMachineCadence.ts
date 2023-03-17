@@ -1,3 +1,5 @@
+// tipagem da configuração da antecipação
+
 type AnticipatorConfig = {
   columnSize: number;
   minToAnticipate: number;
@@ -6,21 +8,26 @@ type AnticipatorConfig = {
   defaultCadence: number;
 };
 
+// tipagem da coordenada do slot
 type SlotCoordinate = {
   column: number;
   row: number;
 };
 
+//  tipagem dos simbolos especiais
 type SpecialSymbol = { specialSymbols: Array<SlotCoordinate> };
 
+// tipagem dos rounds dos símbolos
 type RoundsSymbols = {
   roundOne: SpecialSymbol;
   roundTwo: SpecialSymbol;
   roundThree: SpecialSymbol;
 };
 
+// tipagem do slot da cadência
 type SlotCadence = Array<number>;
 
+//  tipagem dos rounds por cadência
 type RoundsCadences = {
   roundOne: SlotCadence;
   roundTwo: SlotCadence;
@@ -35,6 +42,7 @@ type RoundsCadences = {
  * @param anticipateCadence It's the cadence value when has anticipation.
  * @param defaultCadence It's the cadence value when don't has anticipation.
  */
+
 const anticipatorConfig: AnticipatorConfig = {
   columnSize: 5,
   minToAnticipate: 2,
@@ -71,7 +79,11 @@ const gameRounds: RoundsSymbols = {
 /**
  * This must be used to get all game rounds cadences.
  */
-const slotMachineCadences: RoundsCadences = { roundOne: [], roundTwo: [], roundThree: [] };
+const slotMachineCadences: RoundsCadences = {
+  roundOne: [],
+  roundTwo: [],
+  roundThree: [],
+};
 
 /**
  * This function receives an array of coordinates relative to positions in the slot machine's matrix.
@@ -93,9 +105,11 @@ function slotCadence(symbols: Array<SlotCoordinate>): SlotCadence {
 function handleCadences(rounds: RoundsSymbols): RoundsCadences {
   slotMachineCadences.roundOne = slotCadence(rounds.roundOne.specialSymbols);
   slotMachineCadences.roundTwo = slotCadence(rounds.roundTwo.specialSymbols);
-  slotMachineCadences.roundThree = slotCadence(rounds.roundThree.specialSymbols);
+  slotMachineCadences.roundThree = slotCadence(
+    rounds.roundThree.specialSymbols
+  );
 
   return slotMachineCadences;
 }
 
-console.log('CADENCES: ', handleCadences(gameRounds));
+console.log("CADENCES: ", handleCadences(gameRounds));
