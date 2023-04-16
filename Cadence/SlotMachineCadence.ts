@@ -40,7 +40,7 @@ const anticipatorConfig: AnticipatorConfig = {
   minToAnticipate: 2,
   maxToAnticipate: 3,
   anticipateCadence: 2,
-  defaultCadence: 0.25,
+  defaultCadence: 0.25
 };
 
 /**
@@ -51,27 +51,31 @@ const gameRounds: RoundsSymbols = {
     specialSymbols: [
       { column: 0, row: 2 },
       { column: 1, row: 3 },
-      { column: 3, row: 4 },
-    ],
+      { column: 3, row: 4 }
+    ]
   },
   roundTwo: {
     specialSymbols: [
       { column: 0, row: 2 },
-      { column: 0, row: 3 },
-    ],
+      { column: 0, row: 3 }
+    ]
   },
   roundThree: {
     specialSymbols: [
       { column: 4, row: 2 },
-      { column: 4, row: 3 },
-    ],
-  },
+      { column: 4, row: 3 }
+    ]
+  }
 };
 
 /**
  * This must be used to get all game rounds cadences.
  */
-const slotMachineCadences: RoundsCadences = { roundOne: [], roundTwo: [], roundThree: [] };
+const slotMachineCadences: RoundsCadences = {
+  roundOne: [],
+  roundTwo: [],
+  roundThree: []
+};
 
 /**
  * This function receives an array of coordinates relative to positions in the slot machine's matrix.
@@ -81,8 +85,52 @@ const slotMachineCadences: RoundsCadences = { roundOne: [], roundTwo: [], roundT
  * @returns SlotCadence Array of numbers representing the slot machine stop cadence.
  */
 function slotCadence(symbols: Array<SlotCoordinate>): SlotCadence {
-  // Magic
-  return [];
+  const {
+    columnSize,
+    minToAnticipate,
+    maxToAnticipate,
+    defaultCadence,
+    anticipateCadence
+  } = anticipatorConfig;
+
+  const columns = symbols.map(({ column }) => column);
+  const colMinimum = Math.min(...columns);
+  const colMaximum = Math.max(...columns);
+  const cadence: number[] = [0];
+  let currentCadence = defaultCadence;
+
+  const fillCadenceArray = (
+    iterate: Boolean,
+    isAnticipation: Boolean,
+    slot: number
+  ): void => {
+    currentCadence = isAnticipation ? anticipateCadence : defaultCadence;
+
+    if (iterate && isAnticipation) {
+      for (slot; cadence.length < columnSize; slot++) {
+        cadence.push(cadence[slot] + currentCadence);
+      }
+    } else {
+      cadence.push(cadence[slot] + currentCadence);
+    }
+  };
+
+  // maximum amount of symbols
+  const hasMaximumSymbols: Boolean =
+    symbols.length >= minToAnticipate && symbols.length === maxToAnticipate;
+
+  for (let index = 0; cadence.length < columnSize; index++) {
+    const isColMinimum: Boolean = index === colMinimum;
+    const isInRange: Boolean = index >= colMinimum && index < colMaximum;
+
+    fillCadenceArray(
+      !hasMaximumSymbols,
+      hasMaximumSymbols ? isInRange : isColMinimum,
+      index
+    );
+  }
+
+  return cadence;
 }
 
 /**
@@ -93,7 +141,9 @@ function slotCadence(symbols: Array<SlotCoordinate>): SlotCadence {
 function handleCadences(rounds: RoundsSymbols): RoundsCadences {
   slotMachineCadences.roundOne = slotCadence(rounds.roundOne.specialSymbols);
   slotMachineCadences.roundTwo = slotCadence(rounds.roundTwo.specialSymbols);
-  slotMachineCadences.roundThree = slotCadence(rounds.roundThree.specialSymbols);
+  slotMachineCadences.roundThree = slotCadence(
+    rounds.roundThree.specialSymbols
+  );
 
   return slotMachineCadences;
 }
